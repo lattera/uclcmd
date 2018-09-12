@@ -1,21 +1,24 @@
-# Debugging on
-CFLAGS?=-g -O0
-CFLAGS+=-Wall
-CFLAGS+=`pkg-config --cflags libucl`
-LIBS+=`pkg-config --libs libucl`
-PREFIX?=/usr/local
-SRCS=uclcmd.c uclcmd_common.c uclcmd_get.c uclcmd_merge.c \
-	uclcmd_output.c uclcmd_parse.c uclcmd_remove.c uclcmd_set.c
-OBJS=$(SRCS:.c=.o)
-EXECUTABLE=uclcmd
+PROG=	uclcmd
+SRCS=	\
+	uclcmd.c \
+	uclcmd_common.c \
+	uclcmd_get.c \
+	uclcmd_merge.c \
+	uclcmd_output.c \
+	uclcmd_parse.c \
+	uclcmd_remove.c \
+	uclcmd_set.c
+MAN=
 
-all: $(SRCS) $(EXECUTABLE)
+.if defined(PREFIX)
+BINDIR?=	${PREFIX}/bin
+.else
+BINDIR?=	/usr/bin
+.endif
 
-$(EXECUTABLE): $(OBJS)
-	$(CC) $(LDFLAGS) $(LIBS) -o $(EXECUTABLE) $(OBJS)
+CFLAGS+=	-I/usr/local/include
+LDFLAGS+=	-L/usr/local/lib
 
-clean:
-	rm -f *.o $(EXECUTABLE)
+LDADD=	-lucl
 
-install: $(EXECUTABLE)
-	$(INSTALL) -m0755 $(EXECUTABLE) $(DESTDIR)$(PREFIX)/bin/$(EXECUTABLE)
+.include <bsd.prog.mk>
